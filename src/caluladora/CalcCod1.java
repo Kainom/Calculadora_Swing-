@@ -10,12 +10,13 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -32,9 +33,8 @@ public class CalcCod1 extends JFrame {
     private String n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, memoria = "", tela = "";
     private int resultado, verifica = -1, verficaOperation = 0, verifica2 = 1, soma1, multi;
 
-    private JPanel jpCalc;
+    private JPanel jpCalc,sobre;
     private JLabel lblOperation, lblCalculadora;
-    private Pane painel;
     private List<JButton> btns, btnsOperation;
     private JButton igual, delet, soma, multiplicacao;
     private ImageIcon icon = new ImageIcon(getClass().getResource("/imagens/Calc.png"));
@@ -44,8 +44,6 @@ public class CalcCod1 extends JFrame {
 
         configurarJanela();
         configurarPanel();
-        this.lblCalculadora.setBounds(10, 0, 280, 245);
-
         configurarElementos();
 
     }
@@ -58,12 +56,24 @@ public class CalcCod1 extends JFrame {
         this.setResizable(false);
         this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
         this.setUndecorated(true); // retira a barra superior da janela 
-        painel = new Pane(imag);
-        this.add(painel);
+        
+        KeyboardFocusManager
+    .getCurrentKeyboardFocusManager()
+    .addKeyEventDispatcher(this:: saida);
+        
+    }
+    
+    private  boolean saida(KeyEvent e){
+        if(e.getID() == e.KEY_RELEASED 
+                        && e.getKeyCode() == KeyEvent.VK_ESCAPE){
+                    dispose();
+                    return true;
+                }
+                return false;
     }
 
     private void configurarElementos() {
-        lblOperation = new JLabel("(:");
+        lblOperation = new JLabel("KKKKKKKKKKKKK");
         btns = new ArrayList<>();
         btnsOperation = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -73,198 +83,79 @@ public class CalcCod1 extends JFrame {
 //            this.btns.get(i).setOpaque(false);
         }
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i <= 7; i++) {
             this.btnsOperation.add(new JButton());
             this.btnsOperation.get(i).setForeground(Color.black);
             this.btnsOperation.get(i).setBackground(Color.black);
 //             this.btnsOperation.get(i).setOpaque(false);
 
         }
-        
-        
-        btns.get(0).setBounds(102, 205, 39, 23);
-        btns.get(1).setBounds(50, 172, 39, 23);
-        btns.get(2).setBounds(104, 172, 37, 23);
+
+        btns.get(0).setBounds(104, 206, 37, 22);
+        btns.get(1).setBounds(51, 172, 38, 22);
+        btns.get(2).setBounds(104, 172, 37, 22);
         btns.get(3).setBounds(157, 172, 39, 23);
-        btns.get(4).setBounds(50, 137, 39, 23);
-        btns.get(5).setBounds(102, 137, 39, 23);
+        btns.get(4).setBounds(51, 138, 38, 22);
+        btns.get(5).setBounds(104, 138, 37, 22);
         btns.get(6).setBounds(157, 137, 39, 23);
-        btns.get(7).setBounds(50, 102, 39, 25);
-        btns.get(8).setBounds(102, 102, 39, 25);
+        btns.get(7).setBounds(51, 102, 38, 24);
+        btns.get(8).setBounds(104, 102, 37, 24);
         btns.get(9).setBounds(157, 102, 39, 24);
 
         this.btnsOperation.get(0).setBounds(157, 205, 39, 23); //igual
         this.btnsOperation.get(1).setBounds(452, 110, 39, 25); //delet
-        this.btnsOperation.get(2).setBounds(210, 133, 39, 21); // soma
-        this.btnsOperation.get(3).setBounds(210, 210, 39, 21); //multiplication
+        this.btnsOperation.get(2).setBounds(210, 134, 39, 18); // soma
+        this.btnsOperation.get(3).setBounds(210, 210, 39, 17); //multiplication
+        this.btnsOperation.get(4).setBounds(210, 160, 39, 18);  // subtração
+        this.btnsOperation.get(5).setBounds(210, 184, 39, 18);// divisão
+        this.btnsOperation.get(6).setBounds(210, 102, 39, 24); //ac
+        this.btnsOperation.get(7).setBounds(51, 206, 39, 23); // ponto
 
-        this.lblOperation.setBounds(100, 80, 30, 20);
+        this.lblCalculadora.setBounds(10, 0, 280, 245);
+
+        this.lblOperation.setPreferredSize(new Dimension(1000,40)); //multiplication
         this.lblOperation.setForeground(new Color(0, 0, 0));
         this.lblOperation.setFont(new Font("Arial Black", Font.BOLD, 18));
+        this.lblOperation.setText(("<html>&#128522;<hmtl>"));
 
     }
 
     private void configurarPanel() {
         jpCalc = new JPanel();
+        sobre = new JPanel();
         lblCalculadora = new JLabel(icon);
 
-        this.painel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 
         this.jpCalc.setLayout((null));
         this.jpCalc.setPreferredSize(new Dimension(300, 400));
         this.jpCalc.setBackground(Color.red);
         this.jpCalc.setOpaque(false);
-
+        
+        this.sobre.setLayout((new FlowLayout(FlowLayout.LEFT,0,0)));
+        this.sobre.setBounds(55, 30, 190, 45);
+        this.sobre.setBackground(Color.red);
+        this.sobre.setOpaque(false);
+        
         configurarElementos();
-        this.painel.add(this.jpCalc);
+        this.add(this.jpCalc);
+        this.jpCalc.add(this.sobre);
         this.jpCalc.add(this.lblCalculadora);
+                this.sobre.add(this.lblOperation);
+
         this.btns.stream().forEach(jpCalc::add);
         this.btnsOperation.stream().forEach(jpCalc::add);
-        this.jpCalc.add(this.lblOperation);
+
+        this.btns.stream().forEach(e -> e.addActionListener(this::numbers));
         
 
     }
 
-//    @Override
-//    public void actionPerformed(ActionEvent e) {
-//        if (e.getSource() == this.bnt0 && verifica2 != 3) {
-//            this.setN0("0"); // valor correspondente ao botão //
-//            this.setMemoria(this.getMemoria() + this.getN0()); // Memória volátil que armazena os valores de todos os bnts //  
-//            this.setTela(this.getTela() + this.getN0()); // Tela que expressa a operação para o usuária(possui caracteres especiais que não sao convertidos para a operação )//      
-//            this.setVerifica(0); // valor que verifica o botão apertado // 
-//            lbl2.setText(this.getTela()); // expressa o valor na tela em tempo real // 
-//
-//        } else if (e.getSource() == this.bnt && verifica2 != 3) {
-//            this.setN1("1");
-//            this.setMemoria(this.getMemoria() + this.getN1());   // Armazena o calculo //
-//            this.setTela(this.getTela() + this.getN1());         // Armazena o conteudo do lbl //
-//            this.setVerifica(1);
-//            lbl2.setText(this.getTela());
-//
-//        } else if (e.getSource() == this.bnt1 && verifica2 != 3) {
-//            this.setN2("2");
-//            this.setMemoria(this.getMemoria() + this.getN2());
-//            this.setTela(this.getTela() + this.getN2());
-//            this.setVerifica(2);
-//            lbl2.setText(this.getTela());
-//
-//        } else if (e.getSource() == this.bnt2 && verifica2 != 3) {
-//            this.setN3("3");
-//            this.setMemoria(this.getMemoria() + this.getN3());
-//            this.setTela(this.getTela() + this.getN3());
-//            this.setVerifica(3);
-//            lbl2.setText(this.getTela());
-//
-//        } else if (e.getSource() == this.bnt3 && verifica2 != 3) {
-//            this.setN4("4");
-//            this.setMemoria(this.getMemoria() + this.getN4());
-//            this.setTela(this.getTela() + this.getN4());
-//            this.setVerifica(4);
-//            lbl2.setText(this.getTela());
-//
-//        } else if (e.getSource() == this.bnt4 && verifica2 != 3) {
-//            this.setN5("5");
-//            this.setMemoria(this.getMemoria() + this.getN5());
-//            this.setTela(this.getTela() + this.getN5());
-//            this.setVerifica(5);
-//            lbl2.setText(this.getTela());
-//
-//        } else if (e.getSource() == this.bnt5 && verifica2 != 3) {
-//            this.setN6("6");
-//            this.setMemoria(this.getMemoria() + this.getN6());
-//            this.setTela(this.getTela() + this.getN6());
-//            this.setVerifica(6);
-//            lbl2.setText(this.getTela());
-//
-//        } else if (e.getSource() == this.bnt6 && verifica2 != 3) {
-//            this.setN7("7");
-//            this.setMemoria(this.getMemoria() + this.getN7());
-//            this.setTela(this.getTela() + this.getN7());
-//            this.setVerifica(7);
-//            lbl2.setText(this.getTela());
-//
-//        } else if (e.getSource() == this.bnt7 && verifica2 != 3) {
-//            this.setN8("8");
-//            this.setMemoria(this.getMemoria() + this.getN8());
-//            this.setTela(this.getTela() + this.getN8());
-//            this.setVerifica(8);
-//            lbl2.setText(this.getTela());
-//
-//        } else if (e.getSource() == this.bnt8 && verifica2 != 3) {
-//            this.setN9("9");
-//            this.setMemoria(this.getMemoria() + this.getN9());
-//            this.setTela(this.getTela() + this.getN9());
-//            this.setVerifica(9);
-//            lbl2.setText(this.getTela());
-//
-//        } else if (e.getSource() == this.soma && this.getVerifica() != -1) {
-//            if (this.multi >= 1 && this.soma1 == 0) {
-//                this.setResultado(this.getResultado() * Integer.parseInt(this.getMemoria()));
-//            } else {
-//                this.setResultado(this.getResultado() + Integer.parseInt(this.getMemoria()));
-//            }
-//            if (this.verifica2 == 3 || this.verifica2 == 1) {
-//                this.setResultado(this.getResultado() - 1);
-//            }
-//            this.setMemoria("");
-//            this.setTela(this.getTela() + "+");
-//            lbl2.setText(this.getTela());
-//            this.setVerifica(-1);
-//            this.verficaOperation = 1;
-//            this.verifica2 = 0;
-//            this.soma1++;
-//
-//        } else if (e.getSource() == this.multiplicacao && this.getVerifica() != -1) {
-//            multi++;
-//            if (soma1 >= 1 && multi >= 1) {
-//                this.setResultado(this.getResultado() + Integer.parseInt(this.getMemoria()));
-//                this.soma1 = 0;
-//                this.multi = 0;
-//            } else {
-//                this.setResultado(this.getResultado() * Integer.parseInt(this.getMemoria()));
-//            }
-//
-//            this.setMemoria("");
-//            this.setTela(this.getTela() + "*");
-//            lbl2.setText(this.getTela());
-//            this.setVerifica(-1);       // impossibilita duplicata de simbolos // 
-//            this.verficaOperation = 2;  // atribui o valor 2 que possui significado de multiplicação;
-//            this.verifica2 = 0;         // Possibilita colocar demais numeros //
-//
-//        } else if (e.getSource() == this.igual && this.getVerifica() != -1) {
-//            if (this.verficaOperation >= 1) { // verifica se houve operação // 
-//                if (this.verficaOperation == 1) { // analísa o caráter da operação // 
-//
-//                    this.setResultado(this.getResultado() + Integer.parseInt(this.getMemoria()));
-//                    this.setMemoria("1");// novamente Limpa a memória volátil // 
-//                } else if (this.verficaOperation == 2) {
-//
-//                }
-//                this.setResultado(this.getResultado() * Integer.parseInt(this.getMemoria()));
-//                this.setMemoria("1");
-//                this.setTela(Integer.toString(this.getResultado()));
-//                lbl2.setText(this.getTela());
-//                this.verficaOperation = 0;   // zera as operações // 
-//                this.verifica2 = 3;     // impossibilita modificar o numero do resultado //            
-//            }
-//            this.soma1 = 0;
-//            this.multi = 0;
-//        } else {
-//            lbl2.setText("ERROR"); // Concede erro se houver duplicata de simbolos,se houver // 
-//        }                          // simbolos inicialmente antes de numeros, //
-//        //se clicar no botão de igual sem completar a operação //
-//        if (e.getSource() == this.delet) {
-//            this.setResultado(1);           // seta 0 resultado inicial em 1 para não zerar na multiplicação // 
-//            this.setMemoria(""); // Limpa a memória volátil // 
-//            this.setTela(this.getMemoria()); // Limpar a tela
-//            lbl2.setText("(:");
-//            this.setVerifica(-1);  // impossibilita a discagem de símbolos antes de números //
-//            this.verifica2 = 1;
-//            this.soma1 = 0;
-//            this.multi = 0;
-//        }
-//
-//    }
+    private void numbers(ActionEvent e) {
+
+    }
+
+    
+
     protected class Pane extends JPanel {
 
         protected ImageIcon icon;
