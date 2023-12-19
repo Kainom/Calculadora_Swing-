@@ -17,11 +17,16 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 /**
@@ -78,19 +83,20 @@ public class CalcCod1 extends JFrame {
     }
 
     private boolean numberBoard(KeyEvent e) {
-        char numero = e.getKeyChar();
+        char cod = e.getKeyChar();
 
-        if (e.getID() == e.KEY_RELEASED && numero >= 48 && numero <= 57) {
-            this.lblOperation.setText(this.lblOperation.getText() + numero);
+        if (e.getID() == e.KEY_RELEASED && cod >= 48 && cod <= 57) {
+            this.lblOperation.setText(this.lblOperation.getText() + cod);
             return true;
-        } else if (e.getID() == e.KEY_RELEASED) {
+        } else if(e.getID() == e.KEY_RELEASED){
             for (char operand : this.operatio) {
-                if (operand == numero) {
-                    this.lblOperation.setText(this.lblOperation.getText() + numero);
+                if (operand == cod) {
+                    this.lblOperation.setText(this.lblOperation.getText() + cod);
                 }
             }
-            if (numero == 127 || numero == 8) {
-                this.lblOperation.setText("");
+            if(cod == '(' || cod == ')'){
+                System.out.println(cod);
+                this.lblOperation.setText(this.lblOperation.getText() + cod);
             }
 
         }
@@ -179,51 +185,88 @@ public class CalcCod1 extends JFrame {
         this.btnsOperation.stream().forEach(e -> e.addActionListener(this::operar));
         this.btns.stream().forEach(e -> e.addActionListener(this::numbers));
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this::numberBoard);
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(funcionalidade -> this.fu(funcionalidade));
+        try{KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(funcionalidade -> this.funcionalidadesKeyBoard(funcionalidade));}catch(NullPointerException ee){}
 
     }
 
-    private boolean fu(KeyEvent funcionalidade) {
+    private boolean funcionalidadesKeyBoard(KeyEvent funcionalidade) {
         char funci = funcionalidade.getKeyChar();
+        int condi = 0;
         Expression exp = new Expression(this.lblOperation.getText());
 
         if (funcionalidade.getID() == funcionalidade.KEY_RELEASED) {
             if (funci == '=') {
-                resultado = exp.resolve();
+                try{
+                resultado = exp.resolve();}catch(NullPointerException ee){
+                    this.lblOperation.setText("ERRO");
+                    return false;
+                }
+                System.out.println(resultado + "ok");
                 this.lblOperation.setText(Double.toString(resultado));
                 ac = resultado;
                 resultado = 0;
-            } else {
+            } else if(funcionalidade.getID() == funcionalidade.KEY_RELEASED && funci == 119){
                 if (!(ac == 0)) { //funcionalidade A
                     int i = 0;
                     for (char c : this.operatio) {
                         if (-1 == this.lblOperation.getText().indexOf(c) && c != '.') {
-                            System.out.println("d");
                             i++;
                         }
                     }
-                    if (i == 4) {
-                        this.lblOperation.setText(("" + Double.parseDouble(this.lblOperation.getText()) * ac));
+                    if (i == 4) { // não há operador
+                        condi = 1;
+                        resultado = Double.parseDouble(this.lblOperation.getText()) * ac;
+                        ac = resultado;
+                        this.lblOperation.setText(("" + resultado));
+                        
 
+                    } else{
+                        condi = 2;
+                        this.lblOperation.setText(this.lblOperation.getText() + ac);
                     }
                 }
             }
+
+            if (funcionalidade.getID() == funcionalidade.KEY_RELEASED && funci == 127) { /// DEL
+                this.lblOperation.setText("");
+                this.ac = 0;
+            } else if (funcionalidade.getID() == funcionalidade.KEY_RELEASED && funci == 8 && !(this.lblOperation.getText().equals(""))) {
+
+                List<String> remove = new ArrayList<>(this.returnList());
+                remove.remove(remove.size() - 1);
+                String removido = remove.stream().collect(Collectors.joining(""));
+
+                this.lblOperation.setText(removido);
+            }
+
             return true;
         }
         return false;
     }
 
+    public List<String> returnList() {
+        List<String> Lista = new ArrayList<>();
+        char array[] = this.lblOperation.getText().toCharArray();
+        for (char d : array) {
+            Lista.add("" + d);
+        }
+        return Lista;
+    }
+
     private void funcionalidades(ActionEvent funcionalidade) {
+        if(this.teste()==0){
         Expression exp = new Expression(this.lblOperation.getText());
 
         if (funcionalidade.getSource().equals(this.btnsFuncionalidades.get(0))) { // funcionalidade =
+
             resultado = exp.resolve();
             this.lblOperation.setText(Double.toString(resultado));
             ac = resultado;
             resultado = 0;
-        } else if (!(ac == 0)) { //funcionalidade A
+
+        } else if (!(ac == 0)) { //funcionalidade Ac
             int i = 0;
-            for (char c : this.operatio) {
+            for (char c : this.operatio) { // funcionalidade que multiplica automaticamente o  ac,caso o usuário nao informe operando,apenando colocando o ac ao lado do número
                 if (-1 == this.lblOperation.getText().indexOf(c) && c != '.') {
                     System.out.println("d");
                     i++;
@@ -231,12 +274,14 @@ public class CalcCod1 extends JFrame {
             }
             if (i == 4) {
                 this.lblOperation.setText(("" + Double.parseDouble(this.lblOperation.getText()) * ac));
+                ac = 0;
 
             }
         }
+        } else{
+//            System.out.println("ERRO");
+        }
     }
-//    Double db = new Double(exp.resolve());
-//                resultado = db.floatValue();
 
     private void operar(ActionEvent e) {
 
@@ -258,6 +303,17 @@ public class CalcCod1 extends JFrame {
             }
         });
 
+    }
+
+    private int teste() {
+        char list[] = this.lblOperation.getText().toCharArray();
+        int erro = 0;
+        for(int i = 0; i< list.length-1;i++){
+            if((list[i]>= 42 && list[i]<=47 ) && (list[i+1] >=42 && list[i+1] <=47)){
+                erro ++;
+            }
+        }
+        return (erro > 0)? 1:0;
     }
 
     protected class Pane extends JPanel {
