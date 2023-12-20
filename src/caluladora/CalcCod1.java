@@ -13,6 +13,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +46,13 @@ public class CalcCod1 extends JFrame {
     private List<JButton> btnsOperation = new ArrayList<>();
     private List<JButton> btns = new ArrayList<>();
     private char operatio[] = {'+', '*', '-', '/', '.'};
+    private Timer time;
+    private ActionListener tempo = (var event) -> {
+        this.lblOperation.setText(" ");
+        this.resultado = 0;
+        this.ac = 0;
+        time.stop();
+    };
 
     private JButton igual, delet, soma, multiplicacao;
     private ImageIcon icon = new ImageIcon(getClass().getResource("/imagens/Calc.png"));
@@ -71,6 +79,9 @@ public class CalcCod1 extends JFrame {
                 .getCurrentKeyboardFocusManager()
                 .addKeyEventDispatcher(this::saida);
 
+        this.time = new Timer(500, tempo);
+        time.setRepeats(false);
+
     }
 
     private boolean saida(KeyEvent e) {
@@ -88,13 +99,13 @@ public class CalcCod1 extends JFrame {
         if (e.getID() == e.KEY_RELEASED && cod >= 48 && cod <= 57) {
             this.lblOperation.setText(this.lblOperation.getText() + cod);
             return true;
-        } else if(e.getID() == e.KEY_RELEASED){
+        } else if (e.getID() == e.KEY_RELEASED) {
             for (char operand : this.operatio) {
                 if (operand == cod) {
                     this.lblOperation.setText(this.lblOperation.getText() + cod);
                 }
             }
-            if(cod == '(' || cod == ')'){
+            if (cod == '(' || cod == ')') {
                 System.out.println(cod);
                 this.lblOperation.setText(this.lblOperation.getText() + cod);
             }
@@ -185,43 +196,34 @@ public class CalcCod1 extends JFrame {
         this.btnsOperation.stream().forEach(e -> e.addActionListener(this::operar));
         this.btns.stream().forEach(e -> e.addActionListener(this::numbers));
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this::numberBoard);
-        try{KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(funcionalidade -> this.funcionalidadesKeyBoard(funcionalidade));}catch(NullPointerException ee){}
+        try {
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(funcionalidade -> this.funcionalidadesKeyBoard(funcionalidade));
+        } catch (NullPointerException ee) {
+        }
 
     }
 
     private boolean funcionalidadesKeyBoard(KeyEvent funcionalidade) {
         char funci = funcionalidade.getKeyChar();
-        int condi = 0;
-        Expression exp = new Expression(this.lblOperation.getText());
 
         if (funcionalidade.getID() == funcionalidade.KEY_RELEASED) {
-            if (funci == '=') {
-                try{
-                resultado = exp.resolve();}catch(NullPointerException ee){
-                    this.lblOperation.setText("ERRO");
-                    return false;
-                }
-                System.out.println(resultado + "ok");
-                this.lblOperation.setText(Double.toString(resultado));
-                ac = resultado;
-                resultado = 0;
-            } else if(funcionalidade.getID() == funcionalidade.KEY_RELEASED && funci == 119){
-                if (!(ac == 0)) { //funcionalidade A
-                    int i = 0;
-                    for (char c : this.operatio) {
-                        if (-1 == this.lblOperation.getText().indexOf(c) && c != '.') {
-                            i++;
-                        }
-                    }
-                    if (i == 4) { // não há operador
-                        condi = 1;
-                        resultado = Double.parseDouble(this.lblOperation.getText()) * ac;
-                        ac = resultado;
-                        this.lblOperation.setText(("" + resultado));
-                        
 
-                    } else{
-                        condi = 2;
+            if (funci == '=') {
+                if ( this.calculo()) {
+                    this.lblOperation.setText(Double.toString(resultado));
+                    ac = resultado;
+                    resultado = 0;
+                } else {
+                    this.lblOperation.setText("Syntax  ERROR");
+                    this.time.start();
+                }
+            } else if (funcionalidade.getID() == funcionalidade.KEY_RELEASED && funci == 119) {
+                if (!(ac == 0)) { //funcionalidade AC
+                    int i = this.testaAC();
+
+                    if (i == 4) { // não há operador
+                        multiAC();
+                    } else {
                         this.lblOperation.setText(this.lblOperation.getText() + ac);
                     }
                 }
@@ -244,6 +246,12 @@ public class CalcCod1 extends JFrame {
         return false;
     }
 
+    private void multiAC() {
+        resultado = Double.parseDouble(this.lblOperation.getText()) * ac;
+        ac = resultado;
+        this.lblOperation.setText(("" + resultado));
+    }
+
     public List<String> returnList() {
         List<String> Lista = new ArrayList<>();
         char array[] = this.lblOperation.getText().toCharArray();
@@ -254,33 +262,52 @@ public class CalcCod1 extends JFrame {
     }
 
     private void funcionalidades(ActionEvent funcionalidade) {
-        if(this.teste()==0){
-        Expression exp = new Expression(this.lblOperation.getText());
 
         if (funcionalidade.getSource().equals(this.btnsFuncionalidades.get(0))) { // funcionalidade =
-
-            resultado = exp.resolve();
-            this.lblOperation.setText(Double.toString(resultado));
-            ac = resultado;
-            resultado = 0;
+            if (this.teste() && this.calculo()) {
+                this.lblOperation.setText(Double.toString(resultado));
+                ac = resultado;
+                resultado = 0;
+            } else {
+                this.lblOperation.setText("Syntax  ERROR");
+                this.time.start();
+            }
 
         } else if (!(ac == 0)) { //funcionalidade Ac
-            int i = 0;
-            for (char c : this.operatio) { // funcionalidade que multiplica automaticamente o  ac,caso o usuário nao informe operando,apenando colocando o ac ao lado do número
-                if (-1 == this.lblOperation.getText().indexOf(c) && c != '.') {
-                    System.out.println("d");
-                    i++;
-                }
-            }
+            int i = testaAC();
             if (i == 4) {
-                this.lblOperation.setText(("" + Double.parseDouble(this.lblOperation.getText()) * ac));
-                ac = 0;
-
+                multiAC();
+            } else {
+                this.lblOperation.setText(this.lblOperation.getText() + ac);
             }
         }
-        } else{
-//            System.out.println("ERRO");
+
+    }
+
+    private int testaAC() {
+        int i = 0;
+        List Ac = this.returnList();
+        for (char c : this.operatio) { // funcionalidade que multiplica automaticamente o  ac,caso o usuário nao informe operando,apenando colocando o ac ao lado do número
+            if (-1 == this.lblOperation.getText().indexOf(c) && c != '.') {
+                System.out.println("d");
+                i++;
+            }
+            if (Ac.get(0).equals("" + c)) {
+                i = 4;
+                break;
+            }
         }
+        return i;
+    }
+
+    private boolean calculo() {
+        Expression exp = new Expression(this.lblOperation.getText());
+        try {
+            resultado = exp.resolve();
+        } catch (Exception err) {
+            return false;
+        }
+        return true;
     }
 
     private void operar(ActionEvent e) {
@@ -305,15 +332,16 @@ public class CalcCod1 extends JFrame {
 
     }
 
-    private int teste() {
+    private boolean teste() { //testa se há sequencia de operando ex:++
         char list[] = this.lblOperation.getText().toCharArray();
         int erro = 0;
-        for(int i = 0; i< list.length-1;i++){
-            if((list[i]>= 42 && list[i]<=47 ) && (list[i+1] >=42 && list[i+1] <=47)){
-                erro ++;
+        for (int i = 0; i < list.length - 1; i++) {
+            if ((list[i] >= 42 && list[i] <= 47) && (list[i + 1] >= 42 && list[i + 1] <= 47)) {
+                erro++;
+                System.out.println("ereo");
             }
         }
-        return (erro > 0)? 1:0;
+        return (erro > 0) ? false : true;
     }
 
     protected class Pane extends JPanel {
