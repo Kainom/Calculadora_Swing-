@@ -39,6 +39,7 @@ public class CalcCod1 extends JFrame {
 //    private String n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, memoria = "", tela = "";
 //    private int resultado, verifica = -1, verficaOperation = 0, verifica2 = 1, soma1, multi;
     private double resultado = 0, ac = 0;
+    private boolean acMutiply;
     private JPanel jpCalc, sobre;
     private JLabel lblCalculadora;
     private JLabel lblOperation = new JLabel();
@@ -209,7 +210,7 @@ public class CalcCod1 extends JFrame {
         if (funcionalidade.getID() == funcionalidade.KEY_RELEASED) {
 
             if (funci == '=') {
-                if ( this.calculo()) {
+                if (this.teste() && this.calculo()) {
                     this.lblOperation.setText(Double.toString(resultado));
                     ac = resultado;
                     resultado = 0;
@@ -222,20 +223,31 @@ public class CalcCod1 extends JFrame {
                     int i = this.testaAC();
 
                     if (i == 4) { // não há operador
-                        multiAC();
+                        this.acMutiply = true;
                     } else {
-                        this.lblOperation.setText(this.lblOperation.getText() + ac);
+                        this.acMutiply = false;
                     }
+                    this.lblOperation.setText(this.lblOperation.getText() + "Ans");
                 }
             }
 
             if (funcionalidade.getID() == funcionalidade.KEY_RELEASED && funci == 127) { /// DEL
                 this.lblOperation.setText("");
                 this.ac = 0;
-            } else if (funcionalidade.getID() == funcionalidade.KEY_RELEASED && funci == 8 && !(this.lblOperation.getText().equals(""))) {
+            } else if (funcionalidade.getID() == funcionalidade.KEY_RELEASED && funci == 8 && !(this.lblOperation.getText().equals(""))) { //BackSpace
 
                 List<String> remove = new ArrayList<>(this.returnList());
-                remove.remove(remove.size() - 1);
+                System.out.println(remove.get(remove.size() - 1));
+                if (remove.get(remove.size() - 1).equals("s")) {
+                    System.out.println("opa");
+                    remove.remove(remove.size() - 1);
+                    remove.remove(remove.size() - 1);
+                    remove.remove(remove.size() - 1);
+
+                } else {
+                    remove.remove(remove.size() - 1);
+
+                }
                 String removido = remove.stream().collect(Collectors.joining(""));
 
                 this.lblOperation.setText(removido);
@@ -246,12 +258,7 @@ public class CalcCod1 extends JFrame {
         return false;
     }
 
-    private void multiAC() {
-        resultado = Double.parseDouble(this.lblOperation.getText()) * ac;
-        ac = resultado;
-        this.lblOperation.setText(("" + resultado));
-    }
-
+    
     public List<String> returnList() {
         List<String> Lista = new ArrayList<>();
         char array[] = this.lblOperation.getText().toCharArray();
@@ -265,10 +272,9 @@ public class CalcCod1 extends JFrame {
 
         if (funcionalidade.getSource().equals(this.btnsFuncionalidades.get(0))) { // funcionalidade =
             if (this.teste() && this.calculo()) {
-                this.lblOperation.setText(Double.toString(resultado));
-                ac = resultado;
-                resultado = 0;
-            } else {
+ this.lblOperation.setText(Double.toString(resultado));
+                    ac = resultado;
+                    resultado = 0;            } else {
                 this.lblOperation.setText("Syntax  ERROR");
                 this.time.start();
             }
@@ -276,20 +282,27 @@ public class CalcCod1 extends JFrame {
         } else if (!(ac == 0)) { //funcionalidade Ac
             int i = testaAC();
             if (i == 4) {
-                multiAC();
+                this.acMutiply = true;
             } else {
-                this.lblOperation.setText(this.lblOperation.getText() + ac);
+                this.acMutiply = false;
             }
+            this.lblOperation.setText(this.lblOperation.getText() + "Ans");
+
         }
 
+    }
+
+    private void configurandoResultado() {
+        this.lblOperation.setText(Double.toString(resultado));
+        ac = resultado;
+        resultado = 0;
     }
 
     private int testaAC() {
         int i = 0;
         List Ac = this.returnList();
-        for (char c : this.operatio) { // funcionalidade que multiplica automaticamente o  ac,caso o usuário nao informe operando,apenando colocando o ac ao lado do número
+        for (char c : this.operatio) { // funcionalidade que  verifica se não há operando ao lado do  ac,apenas colocando o ac ao lado do número
             if (-1 == this.lblOperation.getText().indexOf(c) && c != '.') {
-                System.out.println("d");
                 i++;
             }
             if (Ac.get(0).equals("" + c)) {
@@ -300,8 +313,16 @@ public class CalcCod1 extends JFrame {
         return i;
     }
 
+    private String transforma() {
+        if (this.acMutiply) {
+            return this.lblOperation.getText().replace("Ans", ("*" + ac));
+        } else {
+            return (this.lblOperation.getText().contains("Ans")) ? this.lblOperation.getText().replace("Ans", (ac + "")) : this.lblOperation.getText();
+        }
+    }
+
     private boolean calculo() {
-        Expression exp = new Expression(this.lblOperation.getText());
+        Expression exp = new Expression(this.transforma());
         try {
             resultado = exp.resolve();
         } catch (Exception err) {
