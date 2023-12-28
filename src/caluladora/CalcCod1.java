@@ -204,20 +204,35 @@ public class CalcCod1 extends JFrame {
 
     }
 
+    private boolean verficaQuantidade() {
+        List verifica = this.returnList();
+
+        for (char c : operatio) {
+            System.out.println(-1 == verifica.indexOf(c+""));
+
+            if (!(-1 == verifica.indexOf(c+""))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean funcionalidadesKeyBoard(KeyEvent funcionalidade) {
         char funci = funcionalidade.getKeyChar();
-
+        var cod = funcionalidade.getKeyCode();
         if (funcionalidade.getID() == funcionalidade.KEY_RELEASED) {
+            if ((funci == '=' || cod == 10 || cod == 32)) {
+            var cond = this.verficaQuantidade();
 
-            if (funci == '=') {
-                if (this.teste() && this.calculo()) {
-                    this.lblOperation.setText(Double.toString(resultado));
-                    ac = resultado;
-                    resultado = 0;
-                } else {
-                    this.lblOperation.setText("Syntax  ERROR");
-                    this.time.start();
+                if (cond) {
+                    if (this.teste() && this.calculo()) {
+                        this.configurandoResultado();
+                    } else {
+                        this.lblOperation.setText("Syntax  ERROR");
+                        this.time.start();
+                    }
                 }
+
             } else if (funcionalidade.getID() == funcionalidade.KEY_RELEASED && funci == 119) {
                 if (!(ac == 0)) { //funcionalidade AC
                     int i = this.testaAC();
@@ -236,19 +251,17 @@ public class CalcCod1 extends JFrame {
                 this.ac = 0;
             } else if (funcionalidade.getID() == funcionalidade.KEY_RELEASED && funci == 8 && !(this.lblOperation.getText().equals(""))) { //BackSpace
 
-                List<String> remove = new ArrayList<>(this.returnList());
-                System.out.println(remove.get(remove.size() - 1));
-                if (remove.get(remove.size() - 1).equals("s")) {
-                    System.out.println("opa");
-                    remove.remove(remove.size() - 1);
-                    remove.remove(remove.size() - 1);
-                    remove.remove(remove.size() - 1);
+                List<String> retira = new ArrayList<>(this.returnList());
+                if (retira.get(retira.size() - 1).equals("s")) {
+                    retira.remove(retira.size() - 1);
+                    retira.remove(retira.size() - 1);
+                    retira.remove(retira.size() - 1);
 
                 } else {
-                    remove.remove(remove.size() - 1);
+                    retira.remove(retira.size() - 1);
 
                 }
-                String removido = remove.stream().collect(Collectors.joining(""));
+                String removido = retira.stream().collect(Collectors.joining(""));
 
                 this.lblOperation.setText(removido);
             }
@@ -258,7 +271,6 @@ public class CalcCod1 extends JFrame {
         return false;
     }
 
-    
     public List<String> returnList() {
         List<String> Lista = new ArrayList<>();
         char array[] = this.lblOperation.getText().toCharArray();
@@ -270,11 +282,10 @@ public class CalcCod1 extends JFrame {
 
     private void funcionalidades(ActionEvent funcionalidade) {
 
-        if (funcionalidade.getSource().equals(this.btnsFuncionalidades.get(0))) { // funcionalidade =
+        if (this.verficaQuantidade() && (funcionalidade.getSource().equals(this.btnsFuncionalidades.get(0)))) { // funcionalidade =
             if (this.teste() && this.calculo()) {
- this.lblOperation.setText(Double.toString(resultado));
-                    ac = resultado;
-                    resultado = 0;            } else {
+              this.configurandoResultado();
+            } else {
                 this.lblOperation.setText("Syntax  ERROR");
                 this.time.start();
             }
