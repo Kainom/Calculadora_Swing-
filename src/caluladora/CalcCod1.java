@@ -19,12 +19,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -39,9 +34,8 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
  */
 public class CalcCod1 extends JFrame {
 
-//    private String n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, memoria = "", tela = "";
-//    private int resultado, verifica = -1, verficaOperation = 0, verifica2 = 1, soma1, multi;
     private double resultado = 0, ac = 0;
+    private String expression = "";
     private JPanel jpCalc, sobre;
     private JLabel lblCalculadora;
     private JLabel lblOperation = new JLabel();
@@ -87,9 +81,7 @@ public class CalcCod1 extends JFrame {
 
     }
 
-    private void mouseEvent(MouseEvent evt) {
-
-    }
+    
 
     private boolean saida(KeyEvent e) {
         if (e.getID() == e.KEY_RELEASED
@@ -105,16 +97,19 @@ public class CalcCod1 extends JFrame {
 
         if (e.getID() == e.KEY_RELEASED && cod >= 48 && cod <= 57) {
             this.lblOperation.setText(this.lblOperation.getText() + cod);
+            this.transforma();
             return true;
         } else if (e.getID() == e.KEY_RELEASED) {
             for (char operand : this.operatio) {
                 if (operand == cod) {
                     this.lblOperation.setText(this.lblOperation.getText() + cod);
+                    this.transforma();
                 }
             }
             if (cod == '(' || cod == ')') {
-                System.out.println(cod);
                 this.lblOperation.setText(this.lblOperation.getText() + cod);
+                            this.transforma();
+
             }
 
         }
@@ -199,7 +194,7 @@ public class CalcCod1 extends JFrame {
         this.btnsOperation.stream().forEach(jpCalc::add);
         this.btnsFuncionalidades.stream().forEach(jpCalc::add);
 
-        this.btnsFuncionalidades.stream().forEach(e -> e.addActionListener(this::funcionalidades));
+        this.btnsFuncionalidades.stream().forEach(e -> e.addActionListener(this::funcionalidadesMouse));
         this.btnsOperation.stream().forEach(e -> e.addActionListener(this::operar));
         this.btns.stream().forEach(e -> e.addActionListener(this::numbers));
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this::numberBoard);
@@ -212,11 +207,12 @@ public class CalcCod1 extends JFrame {
 
     private boolean verficaQuantidade() {
         List verifica = this.returnList();
-
+        int i = 0;
         for (char c : operatio) {
-            if (!(-1 == verifica.indexOf(c + ""))) {
+            if (!(-1 == verifica.indexOf(c + "")) || verifica.get(i).equals("(")){
                 return true;
             }
+            i++;
         }
         return false;
     }
@@ -226,20 +222,22 @@ public class CalcCod1 extends JFrame {
         var cod = funcionalidade.getKeyCode();
         if (funcionalidade.getID() == funcionalidade.KEY_RELEASED) {
             if ((funci == '=' || cod == 10 || cod == 32)) {
+
                 var cond = this.verficaQuantidade();
 
                 if (cond) {
+                    
                     if (this.teste() && this.calculo()) {
                         this.configurandoResultado();
                     } else {
-                        this.lblOperation.setText("Syntax  ERROR");
-                        this.time.start();
+                        this.houveErro();;
                     }
                 }
 
             } else if (funcionalidade.getID() == funcionalidade.KEY_RELEASED && funci == 119) {
                 if (!(ac == 0)) { //funcionalidade AC
                     this.lblOperation.setText(this.lblOperation.getText() + "Ans");
+                    this.transforma();
                 }
             }
 
@@ -254,6 +252,8 @@ public class CalcCod1 extends JFrame {
                 String removido = retira.stream().collect(Collectors.joining(""));
 
                 this.lblOperation.setText(removido);
+                this.transforma();
+                
             }
 
             return true;
@@ -271,22 +271,26 @@ public class CalcCod1 extends JFrame {
         return Lista;
     }
 
-    private void funcionalidades(ActionEvent funcionalidade) {
+    private void funcionalidadesMouse(ActionEvent funcionalidade) {
 
         if (this.verficaQuantidade() && (funcionalidade.getSource().equals(this.btnsFuncionalidades.get(0)))) { // funcionalidade =
             if (this.teste() && this.calculo()) {
                 this.configurandoResultado();
             } else {
-                this.lblOperation.setText("Syntax  ERROR");
-                this.time.start();
+                this.houveErro();;
             }
 
         } else if (!(ac == 0)) { //funcionalidade Ac
-
             this.lblOperation.setText(this.lblOperation.getText() + "Ans");
+            this.transforma();
 
         }
 
+    }
+
+    private void houveErro() {
+        this.lblOperation.setText("Syntax  ERROR");
+        this.time.start();
     }
 
     private void configurandoResultado() {
@@ -296,55 +300,67 @@ public class CalcCod1 extends JFrame {
         resultado = 0;
     }
 
-    private int testaAC() {
-        int i = 0;
-        List Ac = this.returnList();
-        for (char c : this.operatio) { // funcionalidade que  verifica se não há operando ao lado do  ac,apenas colocando o ac ao lado do número
-            if (-1 == this.lblOperation.getText().indexOf(c) && c != '.') {
-                i++;
-            }
-
-            if (Ac.get(0).equals("" + c)) {
-                i = 4;
-                break;
+    private boolean testaChar(String teste) {
+        for (char c : this.operatio) {
+            if (teste.equals(c + "")) {
+                return true;
             }
         }
-        return i;
+        return false;
     }
 
-    private String transforma() {
+    private String retornaString(List<String> listString) {
+        String novaString = "";
+        for (String altera : listString) {
+            novaString += altera;
+        }
+        return novaString;
+    }
+
+    private void  transforma() {
         List<String> listAc = new ArrayList<>(this.returnList());
         int checaAc = 0;
+
         for (int i = 0; i < listAc.size() - 1; i++) {
-            if (listAc.get(i).equals("A") && i > 2) {
-                for (char c : this.operatio) {
-                    if (listAc.get(i - 1).equals((c + ""))) {
-                        listAc.add(i, ("" + this.ac));
-                        this.removeAc(listAc, i);
-                        checaAc++;
-                        break;
-                    }
+            if (listAc.get(i).equals("A") ) {
+
+                if (this.testaChar(listAc.get(i - 1))) {
+                    listAc.add(i, ("" + this.ac));
+                    this.removeAc(listAc, i);
+                    checaAc++;
+                    break;
                 }
+
+                System.out.println(i>=1);
                 if (checaAc == 0 && i >= 1) {
-                    System.out.println("k");
+                    System.out.println("Entramos");
                     listAc.add(i, ("*" + this.ac));
                     this.removeAc(listAc, i);
 
                 }
-                
 
                 checaAc = 0;
-            } else if(i == 0 && listAc.get(i).equals("A")){
-                listAc.add(i,(""+this.ac));
+            } 
+            
+            if (i == 0 && listAc.get(i).equals("A")) {
+                System.out.println("Prima");
+                listAc.add(i, ("" + this.ac));
                 this.removeAc(listAc, i);
+
             }
         }
 
-        String novaExpression = "";
-        for (String remodela : listAc) {
-            novaExpression += remodela;
+        this.expression = this.retornaString(listAc);
+
+        char tesd[] = this.expression.toCharArray();
+
+        for (int i = 1; i < tesd.length - 1; i++) { // possiblitar essa expressão -> numero(numero)  -> transforma em : numero * (numero);
+            if (tesd[i] == 40 && (tesd[i - 1] >= 48 || tesd[i - 1] <= 58)) {
+                listAc.add(i, "*");
+            }
         }
-        return novaExpression;
+        this.expression = this.retornaString(listAc);
+        System.out.println(this.expression);
 
     }
 
@@ -355,7 +371,7 @@ public class CalcCod1 extends JFrame {
     }
 
     private boolean calculo() {
-        Expression exp = new Expression(this.transforma());
+        Expression exp = new Expression(this.expression);
         try {
             resultado = exp.resolve();
         } catch (Exception err) {
@@ -371,23 +387,26 @@ public class CalcCod1 extends JFrame {
             if (e.getSource().equals(btn)) {
                 System.out.println(operador);
                 this.lblOperation.setText((this.lblOperation.getText() + operador));
+                this.transforma();
             }
         });
     }
 
-    private void numbers(ActionEvent e) {
+    private void numbers(ActionEvent e) { // numeros selecionados pelos botões 
 
         this.btns.stream().forEach((btn) -> {
             String numbers = btn.getText();
             if (e.getSource().equals(btn)) {
                 this.lblOperation.setText(this.lblOperation.getText() + numbers);
+                this.transforma();
             }
         });
 
     }
 
     private boolean teste() { //testa se há sequencia de operando ex:++
-        char list[] = this.lblOperation.getText().toCharArray();
+        this.transforma();
+        char list[] = this.expression.toCharArray();
         int erro = 0;
         for (int i = 0; i < list.length - 1; i++) {
             if ((list[i] >= 42 && list[i] <= 47) && (list[i + 1] >= 42 && list[i + 1] <= 47)) {
