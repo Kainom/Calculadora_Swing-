@@ -81,8 +81,6 @@ public class CalcCod1 extends JFrame {
 
     }
 
-    
-
     private boolean saida(KeyEvent e) {
         if (e.getID() == e.KEY_RELEASED
                 && e.getKeyCode() == KeyEvent.VK_ESCAPE) {
@@ -108,7 +106,7 @@ public class CalcCod1 extends JFrame {
             }
             if (cod == '(' || cod == ')') {
                 this.lblOperation.setText(this.lblOperation.getText() + cod);
-                            this.transforma();
+                this.transforma();
 
             }
 
@@ -207,9 +205,12 @@ public class CalcCod1 extends JFrame {
 
     private boolean verficaQuantidade() {
         List verifica = this.returnList();
+        this.transforma();
         int i = 0;
+
+        System.out.println(expression  + "Tomato");
         for (char c : operatio) {
-            if (!(-1 == verifica.indexOf(c + "")) || verifica.get(i).equals("(")){
+            if (!(-1 == expression.indexOf(c + "")) || expression.charAt(i) == '(') {
                 return true;
             }
             i++;
@@ -224,9 +225,9 @@ public class CalcCod1 extends JFrame {
             if ((funci == '=' || cod == 10 || cod == 32)) {
 
                 var cond = this.verficaQuantidade();
-
+                System.out.println(cond);
                 if (cond) {
-                    
+
                     if (this.teste() && this.calculo()) {
                         this.configurandoResultado();
                     } else {
@@ -242,18 +243,11 @@ public class CalcCod1 extends JFrame {
             }
 
             if (funcionalidade.getID() == funcionalidade.KEY_RELEASED && funci == 127) { /// DEL
-                this.lblOperation.setText("");
-                this.ac = 0;
+                this.del();
             } else if (funcionalidade.getID() == funcionalidade.KEY_RELEASED && funci == 8 && !(this.lblOperation.getText().equals(""))) { //BackSpace
 
-                List<String> retira = new ArrayList<>(this.returnList());
-                retira.remove(retira.size() - 1);
+                this.backSpace();
 
-                String removido = retira.stream().collect(Collectors.joining(""));
-
-                this.lblOperation.setText(removido);
-                this.transforma();
-                
             }
 
             return true;
@@ -261,7 +255,27 @@ public class CalcCod1 extends JFrame {
         return false;
     }
 
-    public List<String> returnList() {
+    private void del() {
+        this.lblOperation.setText("");
+        this.ac = 0;
+    }
+
+    private void backSpace() {
+        List<String> retira = new ArrayList<>(this.returnList());
+
+        if (retira.get(retira.size() - 1).equals("s")) {
+            retira.remove(retira.size() - 1);
+            retira.remove(retira.size() - 1);
+
+        }
+        retira.remove(retira.size() - 1);
+        String removido = retira.stream().collect(Collectors.joining(""));
+
+        this.lblOperation.setText(removido);
+        this.transforma();
+    }
+
+    private List<String> returnList() {
         List<String> Lista = new ArrayList<>();
         char array[] = this.lblOperation.getText().toCharArray();
         for (char d : array) {
@@ -317,37 +331,36 @@ public class CalcCod1 extends JFrame {
         return novaString;
     }
 
-    private void  transforma() {
+    private void transforma() {
         List<String> listAc = new ArrayList<>(this.returnList());
         int checaAc = 0;
 
         for (int i = 0; i < listAc.size() - 1; i++) {
-            if (listAc.get(i).equals("A") ) {
+            if (listAc.get(i).equals("A") && i >=1) {
 
                 if (this.testaChar(listAc.get(i - 1))) {
                     listAc.add(i, ("" + this.ac));
-                    this.removeAc(listAc, i);
+                    this.removeAns(listAc, i);
                     checaAc++;
                     break;
                 }
-
-                System.out.println(i>=1);
-                if (checaAc == 0 && i >= 1) {
+                System.out.println(checaAc +"checa");
+                if (checaAc == 0) {
                     System.out.println("Entramos");
                     listAc.add(i, ("*" + this.ac));
-                    this.removeAc(listAc, i);
+                    this.removeAns(listAc, i);
+                    checaAc = 0;
 
                 }
 
                 checaAc = 0;
-            } 
-            
-            if (i == 0 && listAc.get(i).equals("A")) {
-                System.out.println("Prima");
+            } else if (i == 0 && listAc.get(i).equals("A")) {
+                System.out.println("Ok");
                 listAc.add(i, ("" + this.ac));
-                this.removeAc(listAc, i);
+                this.removeAns(listAc, i);
 
             }
+
         }
 
         this.expression = this.retornaString(listAc);
@@ -364,7 +377,7 @@ public class CalcCod1 extends JFrame {
 
     }
 
-    private void removeAc(List removeAc, int num) {
+    private void removeAns(List removeAc, int num) {
         removeAc.remove(num + 1);
         removeAc.remove(num + 1);
         removeAc.remove(num + 1);
