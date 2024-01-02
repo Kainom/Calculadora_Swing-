@@ -15,7 +15,6 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -208,15 +207,19 @@ public class CalcCod1 extends JFrame {
         this.transforma();
         int i = 0;
 
-        System.out.println(expression  + "Tomato");
+        System.out.println(expression + "Tomato");
         for (char c : operatio) {
             if (!(-1 == expression.indexOf(c + "")) || expression.charAt(i) == '(') {
                 return true;
             }
             i++;
         }
+        
         return false;
     }
+
+
+
 
     private boolean funcionalidadesKeyBoard(KeyEvent funcionalidade) {
         char funci = funcionalidade.getKeyChar();
@@ -336,7 +339,7 @@ public class CalcCod1 extends JFrame {
         int checaAc = 0;
 
         for (int i = 0; i < listAc.size() - 1; i++) {
-            if (listAc.get(i).equals("A") && i >=1) {
+            if (listAc.get(i).equals("A") && i >= 1) {
 
                 if (this.testaChar(listAc.get(i - 1))) {
                     listAc.add(i, ("" + this.ac));
@@ -344,7 +347,7 @@ public class CalcCod1 extends JFrame {
                     checaAc++;
                     break;
                 }
-                System.out.println(checaAc +"checa");
+                System.out.println(checaAc + "checa");
                 if (checaAc == 0) {
                     System.out.println("Entramos");
                     listAc.add(i, ("*" + this.ac));
@@ -388,7 +391,7 @@ public class CalcCod1 extends JFrame {
         try {
             resultado = exp.resolve();
         } catch (Exception err) {
-            return false;
+             return false;
         }
         return true;
     }
@@ -419,15 +422,8 @@ public class CalcCod1 extends JFrame {
 
     private boolean teste() { //testa se há sequencia de operando ex:++
         this.transforma();
-        char list[] = this.expression.toCharArray();
-        int erro = 0;
-        for (int i = 0; i < list.length - 1; i++) {
-            if ((list[i] >= 42 && list[i] <= 47) && (list[i + 1] >= 42 && list[i + 1] <= 47)) {
-                erro++;
-                System.out.println("ereo");
-            }
-        }
-        return (erro > 0) ? false : true;
+   
+        return true;
     }
 
     protected class Pane extends JPanel {
