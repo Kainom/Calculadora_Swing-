@@ -18,6 +18,8 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -43,6 +45,7 @@ public class CalcCod1 extends JFrame {
     private List<JButton> btns = new ArrayList<>();
     private char operatio[] = {'+', '*', '-', '/', '.'};
     private Timer time;
+    private Function<List<String>,String> recebeString = list -> list.stream().collect(Collectors.joining(""));
     private ActionListener tempo = (var event) -> {
         this.lblOperation.setText(" ");
         this.resultado = 0;
@@ -94,18 +97,18 @@ public class CalcCod1 extends JFrame {
 
         if (e.getID() == e.KEY_RELEASED && cod >= 48 && cod <= 57) {
             this.lblOperation.setText(this.lblOperation.getText() + cod);
-            this.transforma();
+            this.transformaEtesta();
             return true;
         } else if (e.getID() == e.KEY_RELEASED) {
             for (char operand : this.operatio) {
                 if (operand == cod) {
                     this.lblOperation.setText(this.lblOperation.getText() + cod);
-                    this.transforma();
+                    this.transformaEtesta();
                 }
             }
             if (cod == '(' || cod == ')') {
                 this.lblOperation.setText(this.lblOperation.getText() + cod);
-                this.transforma();
+                this.transformaEtesta();
 
             }
 
@@ -203,8 +206,7 @@ public class CalcCod1 extends JFrame {
     }
 
     private boolean verficaQuantidade() {
-        List verifica = this.returnList();
-        this.transforma();
+        this.transformaEtesta();
         int i = 0;
 
         System.out.println(expression + "Tomato");
@@ -214,12 +216,9 @@ public class CalcCod1 extends JFrame {
             }
             i++;
         }
-        
+
         return false;
     }
-
-
-
 
     private boolean funcionalidadesKeyBoard(KeyEvent funcionalidade) {
         char funci = funcionalidade.getKeyChar();
@@ -228,10 +227,9 @@ public class CalcCod1 extends JFrame {
             if ((funci == '=' || cod == 10 || cod == 32)) {
 
                 var cond = this.verficaQuantidade();
-                System.out.println(cond);
                 if (cond) {
 
-                    if (this.teste() && this.calculo()) {
+                    if (this.calculo()) {
                         this.configurandoResultado();
                     } else {
                         this.houveErro();;
@@ -241,7 +239,7 @@ public class CalcCod1 extends JFrame {
             } else if (funcionalidade.getID() == funcionalidade.KEY_RELEASED && funci == 119) {
                 if (!(ac == 0)) { //funcionalidade AC
                     this.lblOperation.setText(this.lblOperation.getText() + "Ans");
-                    this.transforma();
+                    this.transformaEtesta();
                 }
             }
 
@@ -275,7 +273,7 @@ public class CalcCod1 extends JFrame {
         String removido = retira.stream().collect(Collectors.joining(""));
 
         this.lblOperation.setText(removido);
-        this.transforma();
+        this.transformaEtesta();
     }
 
     private List<String> returnList() {
@@ -299,7 +297,7 @@ public class CalcCod1 extends JFrame {
 
         } else if (!(ac == 0)) { //funcionalidade Ac
             this.lblOperation.setText(this.lblOperation.getText() + "Ans");
-            this.transforma();
+            this.transformaEtesta();
 
         }
 
@@ -326,15 +324,8 @@ public class CalcCod1 extends JFrame {
         return false;
     }
 
-    private String retornaString(List<String> listString) {
-        String novaString = "";
-        for (String altera : listString) {
-            novaString += altera;
-        }
-        return novaString;
-    }
 
-    private void transforma() {
+    private void transformaEtesta() {
         List<String> listAc = new ArrayList<>(this.returnList());
         int checaAc = 0;
 
@@ -347,9 +338,7 @@ public class CalcCod1 extends JFrame {
                     checaAc++;
                     break;
                 }
-                System.out.println(checaAc + "checa");
                 if (checaAc == 0) {
-                    System.out.println("Entramos");
                     listAc.add(i, ("*" + this.ac));
                     this.removeAns(listAc, i);
                     checaAc = 0;
@@ -358,7 +347,6 @@ public class CalcCod1 extends JFrame {
 
                 checaAc = 0;
             } else if (i == 0 && listAc.get(i).equals("A")) {
-                System.out.println("Ok");
                 listAc.add(i, ("" + this.ac));
                 this.removeAns(listAc, i);
 
@@ -366,17 +354,50 @@ public class CalcCod1 extends JFrame {
 
         }
 
-        this.expression = this.retornaString(listAc);
+        this.expression = this.recebeString.apply(listAc);
 
         char tesd[] = this.expression.toCharArray();
 
-        for (int i = 1; i < tesd.length - 1; i++) { // possiblitar essa expressão -> numero(numero)  -> transforma em : numero * (numero);
-            if (tesd[i] == 40 && (tesd[i - 1] >= 48 || tesd[i - 1] <= 58)) {
+        UnaryOperator<String> menosEmais = (sinal) -> {
+            if (sinal.charAt(0) == 43 && sinal.charAt(1) == 45 || sinal.charAt(1) == 43 && sinal.charAt(0) == 45) {
+                return "-";
+            } else if (sinal.charAt(0) == 45 && sinal.charAt(1) == 45) {
+                return "-";
+            } else {
+                return "+";
+            }
+        };
+        this.expression = this.recebeString.apply(listAc);
+
+        for (int i = 01; i < tesd.length - 1; i++) { // corrigindo o erro do usuário ao colocar ++ || -+ || -- || -+
+            if ((tesd[i] == 43 || tesd[i] == 45) && (tesd[i + 1] == 43 || tesd[i + 1] == 45)) {
+                String pega = listAc.get(i) + listAc.get(i + 1);
+                System.out.println(listAc.toString());
+
+                listAc.remove(i);
+                listAc.remove(i);
+
+                listAc.add(i, menosEmais.apply(pega));
+                this.lblOperation.setText(this.recebeString.apply(listAc));
+
+            }
+
+        }
+
+        this.expression = this.recebeString.apply(listAc);
+
+        char tesdf[] = this.expression.toCharArray();
+
+        for (int i = 1; i < tesdf.length - 1; i++) { // possiblitar essa expressão -> numero(numero)  -> transforma em : numero * (numero);
+
+            if ((tesdf[i] == 40 && !this.testaChar(tesdf[i] + "")) && (!this.testaChar(tesdf[i - 1] + ""))) {
                 listAc.add(i, "*");
             }
         }
-        this.expression = this.retornaString(listAc);
-        System.out.println(this.expression);
+
+        this.expression = this.recebeString.apply(listAc);
+//        System.out.println(this.expression + " Transformada");
+        System.out.println(listAc.toString() + " MOD");
 
     }
 
@@ -387,11 +408,12 @@ public class CalcCod1 extends JFrame {
     }
 
     private boolean calculo() {
+        System.out.println(this.expression + "Finaly");
         Expression exp = new Expression(this.expression);
         try {
             resultado = exp.resolve();
         } catch (Exception err) {
-             return false;
+            return false;
         }
         return true;
     }
@@ -403,7 +425,7 @@ public class CalcCod1 extends JFrame {
             if (e.getSource().equals(btn)) {
                 System.out.println(operador);
                 this.lblOperation.setText((this.lblOperation.getText() + operador));
-                this.transforma();
+                this.transformaEtesta();
             }
         });
     }
@@ -414,16 +436,34 @@ public class CalcCod1 extends JFrame {
             String numbers = btn.getText();
             if (e.getSource().equals(btn)) {
                 this.lblOperation.setText(this.lblOperation.getText() + numbers);
-                this.transforma();
+                this.transformaEtesta();
             }
         });
 
     }
 
     private boolean teste() { //testa se há sequencia de operando ex:++
-        this.transforma();
-   
-        return true;
+        this.transformaEtesta();
+//        char charVet[] = this.expression.toCharArray();
+//        List list = this.returnList();
+        int erro = 0;
+////        for (int i = 0; i < charVet.length - 1; i++) {
+////            if ((charVet[i] >= 42 && charVet[i] <= 47) && (charVet[i + 1] >= 42 && charVet[i + 1] <= 47)) {
+////                 list.add(i,"(");
+////                 list.add(i+2,")");
+////            }
+////        }
+//        String agora ="";
+//        for(Object t: list){
+//            agora+= list.get(erro);
+//            erro++;
+//        }
+//        System.out.println(agora +  "Agora");
+//        this.expression = agora;
+//        this.transforma();
+//        erro = 0;
+
+        return (erro == 0);
     }
 
     protected class Pane extends JPanel {
