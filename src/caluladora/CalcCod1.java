@@ -18,6 +18,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -52,6 +53,19 @@ public class CalcCod1 extends JFrame {
         this.resultado = 0;
         this.ac = 0;
         time.stop();
+    };
+    
+    private final BiConsumer<List<JButton>, String> consumidor = (e, texto) -> {
+        int i = 0;
+        for (JButton recebe : e) {
+            if (texto.length() > 0) {
+                recebe.setText(this.operatio[i]+ "");
+            }
+            else {
+                recebe.setText(i + "");
+            }
+            i++;
+        }
     };
 
     private ImageIcon icon = new ImageIcon(getClass().getResource("/imagens/Calc.png"));
@@ -118,79 +132,30 @@ public class CalcCod1 extends JFrame {
         return false;
     }
 
+    
+    
+    private final BiConsumer<List<JButton>,List<Integer>> consum = (btn,bounds)->{
+                int i = 0;
+                for (JButton t : btn) {
+                t.setBounds(bounds.get(i), bounds.get(i + 1), bounds.get(i + 2), bounds.get(i + 3));
+                i+= 4;
+            };
+    };
+
     private void configurarElementos() {
         int i = 0;
-        for (JButton conf : this.btns) {
-            this.btns.get(i).setText(i + "");
-            i++;
-        }
-        i = 0;
-        for (JButton conf : this.btnsOperation) {
-            this.btnsOperation.get(i).setText("" + this.operatio[i]);
-            i++;
-        }
-
+        int j = 0;
+        List<JButton> evita = this.btns;
         
-        
-        
-        
-       ;
-        
-//        btns.get(   // pode-ser acrescentar uima matriz ou uma lista para generlarizar esse valores
-//                0).setBounds(104, 206, 37, 22);            // x x x x
-//        btns.get(
-//                1).setBounds(51, 172, 38, 22);              
-//        btns.get(
-//                2).setBounds(104, 172, 37, 22);
-//        btns.get(
-//                3).setBounds(157, 172, 39, 23);
-//        btns.get(
-//                4).setBounds(51, 138, 38, 22);
-//        btns.get(
-//                5).setBounds(104, 138, 37, 22);
-//        btns.get(
-//                6).setBounds(157, 137, 39, 23);
-//        btns.get(
-//                7).setBounds(51, 102, 38, 24);
-//        btns.get(
-//                8).setBounds(104, 102, 37, 24);
-//        btns.get(
-//                9).setBounds(157, 102, 39, 24);
-        
-         bounds = Arrays.asList(104,206,37,22,51,172,38,22,104,172,37,22,157,172,39,23,51,138,38,22,104,138,37,22,
-         157,137,39,23,51,102,38,24,104,102,37,24,157,102,39,24);
-         
-         i= 0;
-         for(JButton t : this.btns){
-              t.setBounds(
-                      bounds.get(i),
-                      bounds.get(i+1),
-                      bounds.get(i+2),
-                      bounds.get(i+3));
-              i+=4;
-         }
+        this.consumidor.accept(this.btns, "");
+        this.consumidor.accept(this.btnsOperation, "2");
 
-        this.btnsOperation.get(
-                0).setBounds(210, 134, 39, 18); // soma
+        Arrays.asList(104, 206, 37, 22, 51, 172, 38, 22, 104, 172, 37, 22, 157, 172, 39, 23, 51, 138, 38, 22, 104, 138, 37, 22, 157, 137, 39, 23, 51, 102, 38, 24, 104, 102, 37, 24, 157, 102, 39, 24);
+        consum.accept(this.btns,  Arrays.asList(104, 206, 37, 22, 51, 172, 38, 22, 104, 172, 37, 22, 157, 172, 39, 23, 51, 138, 38, 22, 104, 138, 37, 22, 157, 137, 39, 23, 51, 102, 38, 24, 104, 102, 37, 24, 157, 102, 39, 24));
+        consum.accept(this.btnsOperation, Arrays.asList(210, 134, 39, 18, 210, 210, 39, 17, 210, 160, 39, 18, 210, 184, 39, 18, 51, 206, 39, 23));
+        consum.accept(this.btnsFuncionalidades, Arrays.asList(157,205,39,23,210,102,39,24));
 
-        this.btnsOperation.get(
-                1).setBounds(210, 210, 39, 17); //multiplication
 
-        this.btnsOperation.get(
-                2).setBounds(210, 160, 39, 18);  // subtração
-
-        this.btnsOperation.get(
-                3).setBounds(210, 184, 39, 18);// divisão
-
-        this.btnsOperation.get(
-                4).setBounds(51, 206, 39, 23); // ponto
-
-        
-        this.btnsFuncionalidades.get(
-                0).setBounds(157, 205, 39, 23);  //igual
-
-        this.btnsFuncionalidades.get(
-                1).setBounds(210, 102, 39, 24); //AC
 
         this.lblCalculadora.setBounds(
                 10, 0, 280, 245);
@@ -212,17 +177,10 @@ public class CalcCod1 extends JFrame {
 
         lblCalculadora = new JLabel(icon);
 
-        this.jpCalc.setLayout((null));
-        this.jpCalc.setPreferredSize(new Dimension(300, 400));
-        this.jpCalc.setBackground(Color.red);
-        this.jpCalc.setOpaque(false);
+        Painels.configuraPainel(this.jpCalc, null, false, Color.red, new Dimension(300,400));
+        Painels.configuraPainel(this.jpSobre, new FlowLayout(FlowLayout.LEFT,0,0), false, Color.red,55,30,190,45);
 
-        this.jpSobre.setLayout((new FlowLayout(FlowLayout.LEFT, 0, 0)));
-        this.jpSobre.setBounds(55, 30, 190, 45);
-        this.jpSobre.setBackground(Color.red);
-        this.jpSobre.setOpaque(false);
-
-        configurarElementos();
+        this.configurarElementos();
         this.add(this.jpBarTop);
         this.add(this.jpCalc);
         this.jpCalc.add(this.jpSobre);

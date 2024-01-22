@@ -22,14 +22,13 @@ public final class Configura {
     }
 
     public static List<JButton> btns(int quantidade, Color background, Color foreground) {
-        btns = new ArrayList<>();
+            btns = new ArrayList<>();
         for (int i = 0; i < quantidade; i++) {
             btns.add(new JButton());
             btns.get(i).setForeground(Color.white);
             btns.get(i).setBackground(Color.BLACK);
-//            btns.get(i).setBorder(null);
-//            btns.get(i).setContentAreaFilled(false);
-            //btns.get(i).setOpaque(false);
+          //  btns.get(i).setBorder(null);
+          //  btns.get(i).setContentAreaFilled(false);
 
         }
         return btns;
