@@ -19,7 +19,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
@@ -47,21 +49,22 @@ public class CalcCod1 extends JFrame {
     private List<Integer> bounds;
     private char operatio[] = {'+', '*', '-', '/', '.'};
     private Timer time;
-    private Function<List<String>, String> recebeString = list -> list.stream().collect(Collectors.joining(""));
+    private Predicate<String> tamanho = e -> e.length() <= 1;
+
+    private Function<List<String>, String> recebeListaDeString = list -> list.stream().collect(Collectors.joining(""));
     private ActionListener tempo = (var event) -> {
         this.lblOperation.setText(" ");
         this.resultado = 0;
         this.ac = 0;
         time.stop();
     };
-    
+
     private final BiConsumer<List<JButton>, String> consumidor = (e, texto) -> {
         int i = 0;
         for (JButton recebe : e) {
             if (texto.length() > 0) {
-                recebe.setText(this.operatio[i]+ "");
-            }
-            else {
+                recebe.setText(this.operatio[i] + "");
+            } else {
                 recebe.setText(i + "");
             }
             i++;
@@ -132,30 +135,26 @@ public class CalcCod1 extends JFrame {
         return false;
     }
 
-    
-    
-    private final BiConsumer<List<JButton>,List<Integer>> consum = (btn,bounds)->{
-                int i = 0;
-                for (JButton t : btn) {
-                t.setBounds(bounds.get(i), bounds.get(i + 1), bounds.get(i + 2), bounds.get(i + 3));
-                i+= 4;
-            };
+    private final BiConsumer<List<JButton>, List<Integer>> consum = (btn, bounds) -> {
+        int i = 0;
+        for (JButton t : btn) {
+            t.setBounds(bounds.get(i), bounds.get(i + 1), bounds.get(i + 2), bounds.get(i + 3));
+            i += 4;
+        };
     };
 
     private void configurarElementos() {
         int i = 0;
         int j = 0;
         List<JButton> evita = this.btns;
-        
+
         this.consumidor.accept(this.btns, "");
         this.consumidor.accept(this.btnsOperation, "2");
 
         Arrays.asList(104, 206, 37, 22, 51, 172, 38, 22, 104, 172, 37, 22, 157, 172, 39, 23, 51, 138, 38, 22, 104, 138, 37, 22, 157, 137, 39, 23, 51, 102, 38, 24, 104, 102, 37, 24, 157, 102, 39, 24);
-        consum.accept(this.btns,  Arrays.asList(104, 206, 37, 22, 51, 172, 38, 22, 104, 172, 37, 22, 157, 172, 39, 23, 51, 138, 38, 22, 104, 138, 37, 22, 157, 137, 39, 23, 51, 102, 38, 24, 104, 102, 37, 24, 157, 102, 39, 24));
+        consum.accept(this.btns, Arrays.asList(104, 206, 37, 22, 51, 172, 38, 22, 104, 172, 37, 22, 157, 172, 39, 23, 51, 138, 38, 22, 104, 138, 37, 22, 157, 137, 39, 23, 51, 102, 38, 24, 104, 102, 37, 24, 157, 102, 39, 24));
         consum.accept(this.btnsOperation, Arrays.asList(210, 134, 39, 18, 210, 210, 39, 17, 210, 160, 39, 18, 210, 184, 39, 18, 51, 206, 39, 23));
-        consum.accept(this.btnsFuncionalidades, Arrays.asList(157,205,39,23,210,102,39,24));
-
-
+        consum.accept(this.btnsFuncionalidades, Arrays.asList(157, 205, 39, 23, 210, 102, 39, 24));
 
         this.lblCalculadora.setBounds(
                 10, 0, 280, 245);
@@ -177,8 +176,8 @@ public class CalcCod1 extends JFrame {
 
         lblCalculadora = new JLabel(icon);
 
-        Painels.configuraPainel(this.jpCalc, null, false, Color.red, new Dimension(300,400));
-        Painels.configuraPainel(this.jpSobre, new FlowLayout(FlowLayout.LEFT,0,0), false, Color.red,55,30,190,45);
+        Painels.configuraPainel(this.jpCalc, null, false, Color.red, new Dimension(300, 400));
+        Painels.configuraPainel(this.jpSobre, new FlowLayout(FlowLayout.LEFT, 0, 0), false, Color.red, 55, 30, 190, 45);
 
         this.configurarElementos();
         this.add(this.jpBarTop);
@@ -203,13 +202,17 @@ public class CalcCod1 extends JFrame {
     }
 
     private boolean verficaQuantidade() {
+        if (this.lblOperation.getText().length() < 3) {
+            return false;
+        }
         this.transformAndTest();
         int i = 0;
 
-        System.out.println(expression + "Tomato");
         for (char c : operatio) {
-            if (!(-1 == expression.indexOf(c + "")) || expression.charAt(i) == '(') {
-                return true;
+            if (c != '.') {
+                if (!(-1 == expression.indexOf(c + "")) || expression.charAt(i) == '(') {
+                    return true;
+                }
             }
             i++;
         }
@@ -350,7 +353,7 @@ public class CalcCod1 extends JFrame {
 
         }
 
-        this.expression = this.recebeString.apply(listAc);
+        this.expression = this.recebeListaDeString.apply(listAc);
 
         char tesd[] = this.expression.toCharArray();
 
@@ -365,7 +368,7 @@ public class CalcCod1 extends JFrame {
         };
 
         UnaryOperator<String> times = sinal -> "*";
-        this.expression = this.recebeString.apply(listAc);
+        this.expression = this.recebeListaDeString.apply(listAc);
 
         for (int i = 01; i < tesd.length - 1; i++) { // corrigindo o erro do usuário ao colocar ++ || -+ || -- || -+
             if ((tesd[i] == 43 || tesd[i] == 45) && (tesd[i + 1] == 43 || tesd[i + 1] == 45)) {
@@ -375,7 +378,7 @@ public class CalcCod1 extends JFrame {
                 listAc.remove(i);
 
                 listAc.add(i, menosEmais.apply(pega));
-                this.lblOperation.setText(this.recebeString.apply(listAc));
+                this.lblOperation.setText(this.recebeListaDeString.apply(listAc));
 
             }
             if ((tesd[i] == 42 && tesd[i + 1] == 42)) {
@@ -383,29 +386,53 @@ public class CalcCod1 extends JFrame {
                 listAc.remove(i);
                 listAc.remove(i);
                 listAc.add(i, times.apply(pega));
-                this.lblOperation.setText(this.recebeString.apply(listAc));
+                this.lblOperation.setText(this.recebeListaDeString.apply(listAc));
             }
 
         }
 
-        this.expression = this.recebeString.apply(listAc);
-
+        this.expression = this.recebeListaDeString.apply(listAc);
+        listAc.removeAll(listAc);
+        for (int i = 0; i < this.expression.length(); i++) {
+            listAc.add(this.expression.charAt(i) + "");
+        }
         char tesdf[] = this.expression.toCharArray();
+
+        Predicate<String> verificaChar = (k) -> {
+            System.out.println(k);
+            List<String> teste = Arrays.asList("*", "+", "-", "/");
+            return teste.parallelStream().anyMatch(te -> te.equals(k));
+        };
+
+        BiFunction<List<String>, Integer, Integer> opera = (lista, index) -> {
+            for (int i = index; i != 0; i--) {                    //  index =6           12+-222*222
+                if (verificaChar.test(lista.get(i))) {
+                    System.out.println(verificaChar.test(lista.get(i)));
+                    return i;
+                }
+            }
+            return 0;
+        };
 
         for (int i = 1; i < tesdf.length - 1; i++) { // possiblitar essa expressão -> numero(numero)  -> transforma em : numero * (numero); // adiciona o * depois dos  parentesses 
 
             if (tesdf[i] == 42 && this.testaChar(tesdf[i - 1] + "")) {
-                listAc.remove(i - 1);
+//                listAc.remove(i - 1);
+//                Integer index = opera.apply(listAc, (i - 2));
+//                listAc.add(index, "-");
+//                    listAc.add(i - 2, "(");
+//                    listAc.add(i + 1, ")");
+
             } else if (tesdf[i] == 42 && this.testaChar(tesdf[i + 1] + "")) {
                 listAc.remove(i + 1);
+                break;
             }
             if ((tesdf[i] == 40 && !this.testaChar(tesdf[i] + "")) && (!this.testaChar(tesdf[i - 1] + ""))) {
                 listAc.add(i, "*");
             }
         }
 
-        this.expression = this.recebeString.apply(listAc);
-//        System.out.println(this.expression + " Transformada");
+        this.expression = this.recebeListaDeString.apply(listAc);
         System.out.println(listAc.toString() + " MOD");
 
     }
@@ -417,9 +444,9 @@ public class CalcCod1 extends JFrame {
     }
 
     private boolean calculo() {
-        System.out.println(this.expression + "Finaly");
-        Expression exp = new Expression(this.expression);
+
         try {
+            Expression exp = new Expression(this.expression);
             resultado = exp.resolve();
         } catch (Exception err) {
             return false;
