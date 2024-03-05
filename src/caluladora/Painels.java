@@ -13,7 +13,7 @@ import javax.swing.JPanel;
  *
  * @author samuraiblack
  */
-public abstract class Painels {
+public final class Painels {
 
     private Painels() {
 

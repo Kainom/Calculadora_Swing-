@@ -33,6 +33,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+import javax.swing.plaf.ColorUIResource;
 
 /**
  *
@@ -45,9 +46,9 @@ public class CalcCod1 extends JFrame {
     private JPanel jpCalc, jpSobre, jpBarTop;
     private JLabel lblCalculadora;
     private JLabel lblOperation = new JLabel();
-    private List<JButton> btnsFuncionalidades = new ArrayList<>(Configura.btns(2, Color.black, Color.black));
-    private List<JButton> btnsOperation = new ArrayList<>(Configura.btns(5, Color.black, Color.black));
-    private List<JButton> btns = new ArrayList<>(Configura.btns(10, Color.black, Color.black));
+    private List<JButton> btnsFuncionalidades = new ArrayList<>(Configura.listBtns(2, Color.black, Color.black, new ArrayList()));
+    private List<JButton> btnsOperation = new ArrayList<>(Configura.listBtns(5, Color.black, Color.black, new ArrayList()));
+    private List<JButton> btns = new ArrayList<>(Configura.listBtns(10, Color.black, Color.black, new ArrayList()));
     private List<String> operadores = Arrays.asList("*", "+", "-", "/");
     private List<Integer> bounds;
     private char sinals[] = {'+', '*', '-', '/', '.'};
@@ -101,7 +102,6 @@ public class CalcCod1 extends JFrame {
     private void configurarJanela() {
 //        this.setSize(230, 245);
         this.setSize(230, 270);
-        this.setTitle("CALCULADORA TESTE");
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocationRelativeTo(this);
         this.setResizable(false);
@@ -127,20 +127,19 @@ public class CalcCod1 extends JFrame {
         return false;
     }
 
-    private Consumer<String>  zeroInicial = (cod)->{
-                if (this.lblOperation.getText().equals("0")) {
-                this.lblOperation.setText(cod);
-            } else {
-                this.lblOperation.setText(this.lblOperation.getText() + cod);
-            }
+    private Consumer<String> zeroInicial = (cod) -> {
+        if (this.lblOperation.getText().equals("0")) {
+            this.lblOperation.setText(cod);
+        } else {
+            this.lblOperation.setText(this.lblOperation.getText() + cod);
+        }
     };
-    
-    
+
     private boolean numberBoard(KeyEvent e) {
         char cod = e.getKeyChar();
         System.out.println(cod == '~');
         if (e.getID() == e.KEY_RELEASED && cod >= 48 && cod <= 57) {
-            zeroInicial.accept(cod+"");
+            zeroInicial.accept(cod + "");
             this.transformAndTest();
             return true;
         } else if (e.getID() == e.KEY_RELEASED) {
@@ -170,9 +169,6 @@ public class CalcCod1 extends JFrame {
     };
 
     private void configurarElementos() {
-        int i = 0;
-        int j = 0;
-        List<JButton> evita = this.btns;
 
         this.consumidor.accept(this.btns, "");
         this.consumidor.accept(this.btnsOperation, "2");
@@ -198,8 +194,7 @@ public class CalcCod1 extends JFrame {
     private void configurarPanel() {
         jpCalc = new JPanel();
         jpSobre = new JPanel();
-        jpBarTop = BarMenu.bar(230, 30, Color.black, new FlowLayout(FlowLayout.RIGHT, 0, 0), this);
-
+        jpBarTop = BarMenuSimple.bar(230, 30, new ColorUIResource(0, 0, 0), new FlowLayout(FlowLayout.RIGHT, 0, 0), 2, this);
         lblCalculadora = new JLabel(icon);
 
         Painels.configuraPainel(this.jpCalc, null, false, Color.red, new Dimension(300, 400));
@@ -347,12 +342,9 @@ public class CalcCod1 extends JFrame {
     }
 
     private void transformAndTest() {
-        List<String> listAc = new ArrayList<>(this.returnListString(this.lblOperation.getText().toCharArray()
-        ));
-        int checaAc = 0;
+        List<String> listAc = new ArrayList<>(this.returnListString(this.lblOperation.getText().toCharArray()));
 
         if (this.expression.contains("Infinity") && this.verificaChar.test(this.expression)) {
-            System.out.println("Entrou");
             this.houveErro();
             return;
         }
@@ -363,17 +355,14 @@ public class CalcCod1 extends JFrame {
                 if (this.verificaChar.test(listAc.get(i - 1))) {
                     listAc.add(i, ("" + this.ac));
                     this.removeAns(listAc, i);
-                    checaAc++;
-                    break;
-                }
-                if (checaAc == 0) {
+
+                } else { // nao tem operador,logo concluimos que é mutplicação (nAns -> n * Ans) 
+                    System.out.println(listAc);
                     listAc.add(i, ("*" + this.ac));
                     this.removeAns(listAc, i);
-                    checaAc = 0;
 
                 }
 
-                checaAc = 0;
             } else if (i == 0 && listAc.get(i).equals("A")) {
                 listAc.add(i, ("" + this.ac));
                 this.removeAns(listAc, i);

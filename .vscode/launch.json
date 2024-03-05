@@ -1,0 +1,119 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "ProgressiveString",
+            "request": "launch",
+            "mainClass": "com.towel.cfg.ProgressiveString",
+            "projectName": "Towel"
+        },
+        {
+            "type": "java",
+            "name": "PagingTable",
+            "request": "launch",
+            "mainClass": "sandbox.PagingTable",
+            "projectName": "Towel"
+        },
+        {
+            "type": "java",
+            "name": "TableFilterTest",
+            "request": "launch",
+            "mainClass": "test.TableFilterTest",
+            "projectName": "Towel"
+        },
+        {
+            "type": "java",
+            "name": "ActionManagerTest",
+            "request": "launch",
+            "mainClass": "test.awt.ActionManagerTest",
+            "projectName": "Towel"
+        },
+        {
+            "type": "java",
+            "name": "StringUtilTest",
+            "request": "launch",
+            "mainClass": "test.cfg.StringUtilTest",
+            "projectName": "Towel"
+        },
+        {
+            "type": "java",
+            "name": "FieldAcessHandlerTest",
+            "request": "launch",
+            "mainClass": "test.el.FieldAcessHandlerTest",
+            "projectName": "Towel"
+        },
+        {
+            "type": "java",
+            "name": "JImagePanelLoopTest",
+            "request": "launch",
+            "mainClass": "test.img.JImagePanelLoopTest",
+            "projectName": "Towel"
+        },
+        {
+            "type": "java",
+            "name": "JImagePanelSingleTest",
+            "request": "launch",
+            "mainClass": "test.img.JImagePanelSingleTest",
+            "projectName": "Towel"
+        },
+        {
+            "type": "java",
+            "name": "ExpressionTest",
+            "request": "launch",
+            "mainClass": "test.math.ExpressionTest",
+            "projectName": "Towel"
+        },
+        {
+            "type": "java",
+            "name": "ObjectTableModelTest",
+            "request": "launch",
+            "mainClass": "test.model.ObjectTableModelTest",
+            "projectName": "Towel"
+        },
+        {
+            "type": "java",
+            "name": "ComboBoxDynamicFormatterTest",
+            "request": "launch",
+            "mainClass": "test.swing.ComboBoxDynamicFormatterTest",
+            "projectName": "Towel"
+        },
+        {
+            "type": "java",
+            "name": "JTableTest",
+            "request": "launch",
+            "mainClass": "test.swing.JTableTest",
+            "projectName": "Towel"
+        },
+        {
+            "type": "java",
+            "name": "JTableViewTest",
+            "request": "launch",
+            "mainClass": "test.swing.JTableViewTest",
+            "projectName": "Towel"
+        },
+        {
+            "type": "java",
+            "name": "SelectTableViewTest",
+            "request": "launch",
+            "mainClass": "test.swing.SelectTableViewTest",
+            "projectName": "Towel"
+        },
+        {
+            "type": "java",
+            "name": "CalendarViewTest",
+            "request": "launch",
+            "mainClass": "test.swing.calendar.CalendarViewTest",
+            "projectName": "Towel"
+        }
+    ]
+}
