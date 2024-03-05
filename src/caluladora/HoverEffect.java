@@ -4,6 +4,7 @@
  */
 package caluladora;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -30,15 +31,13 @@ public class HoverEffect<T> {
         }
     };
 
-    private FourFunction<Map<T, JButton>, MouseEvent, Integer, T> aplicas = (btn, e, f, chaves) -> {
+    private SixFunction<Map<T, JButton>, MouseEvent, Integer, Color,Color,T> aplicas = (btn, e, f,fgColor,bgColor, chaves) -> {
         for (int i = 0; i < btn.size(); i++) {
             if (e.getSource().equals(btn.get(chaves[i]))) {
                 btn.get(chaves[i]).setFont(new Font("Arial Black", Font.BOLD, f));
+                btn.get(chaves[i]).setForeground(fgColor);
+                btn.get(chaves[i]).setBackground(bgColor);
 
-            }
-
-            if (e.getSource().equals(btn.get(chaves[i]))) {
-                btn.get(chaves[i]).setFont(new Font("Arial Black", Font.BOLD, f));
             }
         }
     };
@@ -54,6 +53,7 @@ public class HoverEffect<T> {
                 aplica.apply(algo, e, 32);
             }
 
+            @Override
             public void mouseExited(MouseEvent e) {
                 aplica.apply(algo, e, 16);
             }
@@ -65,12 +65,12 @@ public class HoverEffect<T> {
         MouseAdapter adapter = new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                aplicas.apply(algo, e, 32,chaves);
+                aplicas.apply(algo, e, 32,Color.red,null,chaves);
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                aplicas.apply(algo, e, 16,chaves);
+                aplicas.apply(algo, e, 16,Color.lightGray,null,chaves);
             }
         };
         return adapter;

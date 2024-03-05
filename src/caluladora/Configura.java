@@ -24,33 +24,34 @@ public final class Configura {
 
     }
 
-    public static <T extends List> List<JButton> listBtns(int quantidade, Color bgColor, Color fgColor, T tipo) {
+    public static <T extends List> List<JButton> listBtns(int quantidade, Color bgColor, Color fgColor,Font font,T tipo) {
         btnsList = tipo;
         for (int i = 0; i < quantidade; i++) {
             btnsList.add(new JButton());
-            btnsList.get(i).setForeground(fgColor = (fgColor.equals(null) ? Color.WHITE : fgColor));
-            btnsList.get(i).setBackground(bgColor = (bgColor.equals(null) ? Color.BLACK : bgColor));
-            //  listBtns.get(i).setBorder(null);
-            //  listBtns.get(i).setContentAreaFilled(false);
+            btnsList.get(i).setForeground(fgColor);
+            btnsList.get(i).setBackground(bgColor);
+//              btnsList.get(i).setBorder(null);
+//              btnsList.get(i).setContentAreaFilled(false);
+//              btnsList.get(i).setFocusPainted(false);
 
         }
         return btnsList;
     }
 
-    public static <T extends Map> Map<String, JButton> mapBtns(int quantidade, Color bgColor, Color fgColor, int weight, int height, T tipo,String... btnsName) {
+    public static <T extends Map> Map<String, JButton> mapBtns(int quantidade, Color bgColor, Color fgColor, Font font,int weight, int height, T tipo,String... btnsName) {
         if (btnsName.length != quantidade) {
             throw new IllegalArgumentException();
         }
         btnsMap = tipo;
         for (int i = 0; i < quantidade; i++) {
             btnsMap.put(btnsName[i], new JButton());
-            btnsMap.get(btnsName[i]).setForeground(fgColor = (fgColor.equals(null) ? Color.WHITE : fgColor));
-            btnsMap.get(btnsName[i]).setBackground(bgColor = (bgColor.equals(null) ? Color.BLACK : bgColor));
+            btnsMap.get(btnsName[i]).setForeground(fgColor);
+            btnsMap.get(btnsName[i]).setBackground(bgColor);
             btnsMap.get(btnsName[i]).setBorder(null);
             btnsMap.get(btnsName[i]).setContentAreaFilled(false);
-            btnsMap.get(btnsName[i]).setFocusPainted(false);;
+            btnsMap.get(btnsName[i]).setFocusPainted(false);
             btnsMap.get(btnsName[i]).setPreferredSize(new Dimension(weight = (weight <= 10) ? 30 : weight, height = (height <= 5) ? 30 : height));
-            btnsMap.get(btnsName[i]).setFont(new Font("Arial Black", Font.BOLD, 16));
+            btnsMap.get(btnsName[i]).setFont(font);
 
         }
         return btnsMap;

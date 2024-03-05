@@ -46,9 +46,9 @@ public class CalcCod1 extends JFrame {
     private JPanel jpCalc, jpSobre, jpBarTop;
     private JLabel lblCalculadora;
     private JLabel lblOperation = new JLabel();
-    private List<JButton> btnsFuncionalidades = new ArrayList<>(Configura.listBtns(2, Color.black, Color.black, new ArrayList()));
-    private List<JButton> btnsOperation = new ArrayList<>(Configura.listBtns(5, Color.black, Color.black, new ArrayList()));
-    private List<JButton> btns = new ArrayList<>(Configura.listBtns(10, Color.black, Color.black, new ArrayList()));
+    private List<JButton> btnsFuncionalidades = new ArrayList<>(Configura.listBtns(2, Color.black, Color.black, null, new ArrayList()));
+    private List<JButton> btnsOperation = new ArrayList<>(Configura.listBtns(5, Color.black, Color.black, null, new ArrayList()));
+    private List<JButton> btns = new ArrayList<>(Configura.listBtns(10, Color.black, Color.black, null, new ArrayList()));
     private List<String> operadores = Arrays.asList("*", "+", "-", "/");
     private List<Integer> bounds;
     private char sinals[] = {'+', '*', '-', '/', '.'};
@@ -196,7 +196,6 @@ public class CalcCod1 extends JFrame {
         jpSobre = new JPanel();
         jpBarTop = BarMenuSimple.bar(230, 30, new ColorUIResource(0, 0, 0), new FlowLayout(FlowLayout.RIGHT, 0, 0), 2, this);
         lblCalculadora = new JLabel(icon);
-
         Painels.configuraPainel(this.jpCalc, null, false, Color.red, new Dimension(300, 400));
         Painels.configuraPainel(this.jpSobre, new FlowLayout(FlowLayout.LEFT, 0, 0), false, Color.red, 55, 30, 190, 45);
 

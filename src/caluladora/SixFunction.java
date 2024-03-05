@@ -9,7 +9,7 @@ package caluladora;
  * @author kainom
  */
 @FunctionalInterface
-public interface FourFunction<A,B,C,D> {
+public interface SixFunction<A,B,C,D,E,F> {
     
-    void apply(A a, B b, C c, D ...d);
+    void apply(A a, B b, C c, D d, E e,F ...f);
 }
